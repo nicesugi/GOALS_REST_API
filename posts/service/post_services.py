@@ -1,4 +1,4 @@
-from posts.serializers import PostSerializer
+from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Post
 
 def read_posts():
@@ -81,7 +81,14 @@ def recover_post(user, post_id):
         post.save()
         
 def read_detail_post(post_id):
+    """
+    Args:
+        post_id : 자세한 내용을 열람하고자 하는 게시글의 id
+
+    Returns:
+        PostDetailSerializer
+    """
     post = Post.objects.get(id=post_id)
     post.update_views
-    post_serializer = PostSerializer(post).data
+    post_serializer = PostDetailSerializer(post).data
     return post_serializer
