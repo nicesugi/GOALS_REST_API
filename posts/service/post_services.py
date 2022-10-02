@@ -19,7 +19,7 @@ def create_post(create_data, user):
             "content" : post의 content,
             "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
             },
-        user : 글을 작성하는 현재 로그인이 되어있는 user
+        user : users.User FK | 글을 작성하는 현재 로그인이 되어있는 user
     """
     create_data['writer'] = user.id
     post_data_serializer = PostSerializer(data=create_data)
@@ -31,3 +31,30 @@ def create_post(create_data, user):
     for tag in tags_data_list:
         Post.objects.last().tags.add(tag)
         
+def edit_post(edit_data, user, post_id):
+    """
+    Args:
+        edit_data : {
+            "title" : post의 title,
+            "content" : post의 content,
+            "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
+            },
+        user : users.User FK | 글을 수정하는 현재 로그인이 되어있는 user
+        post_id : 수정하고자 하는 게시글의 id
+
+    Returns:
+        PostSerializer
+    """
+    edit_data['writer'] = user.id
+    post = Post.objects.get(id=post_id)
+    
+    post_serializer = PostSerializer(post, data=edit_data, partial=True)
+    if post_serializer.is_valid(raise_exception=True):
+        post_serializer.save()
+        
+        tags_data_list = edit_data['tags'].replace(',' , '').split('#')
+        del tags_data_list[0]
+        for tag in tags_data_list:
+            post.tags.add(tag)
+
+        return post_serializer.data
