@@ -38,7 +38,7 @@ def edit_post(edit_data, user, post_id):
             "title" : post의 title,
             "content" : post의 content,
             "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
-            },
+            }
         user : users.User FK | 글을 수정하는 현재 로그인이 되어있는 user
         post_id : 수정하고자 하는 게시글의 id
 
@@ -58,3 +58,13 @@ def edit_post(edit_data, user, post_id):
             post.tags.add(tag)
 
         return post_serializer.data
+    
+def deactivate_post(user, post_id):
+    """
+    Args:
+        user : users.User FK | 글을 비활성화하는 현재 로그인이 되어있는 user
+        post_id : 비활성화하고자 하는 게시글의 id
+    """
+    post = Post.objects.get(id=post_id, writer_id=user)
+    post.is_active = False
+    post.save()
