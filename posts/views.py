@@ -8,7 +8,8 @@ from posts.service.post_services import (
     edit_post,
     deactivate_post,
     recover_post,
-    read_detail_post
+    read_detail_post,
+    like_post
 )
 
 class PostView(APIView):
@@ -37,3 +38,12 @@ class PostDetailView(APIView):
     def get(self, request, post_id):
         post = read_detail_post(post_id)
         return Response(post, status=status.HTTP_200_OK)
+
+
+class LikeView(APIView):
+    def post(self, request, post_id):
+        if like_post(request.user, post_id):
+            return Response({'detail': '좋아요 했습니다'}, status=status.HTTP_200_OK)
+        return Response({'detail': '좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
+        
+        

@@ -1,5 +1,5 @@
 from posts.serializers import PostSerializer, PostDetailSerializer
-from posts.models import Post
+from posts.models import Like, Post
 
 def read_posts():
     """
@@ -92,3 +92,20 @@ def read_detail_post(post_id):
     post.update_views
     post_serializer = PostDetailSerializer(post).data
     return post_serializer
+
+def like_post(user, post_id):
+    """
+    Args:
+        user : users.User FK | 좋아요/좋아요취소 하는 사용자
+        post_id : 좋아요/좋아요취소 하는 게시글의 id
+
+    Returns:
+        True : "좋아요",
+        False : "좋아요취소" 
+    """
+    post = Post.objects.get(id=post_id)
+    getted_like_obj, created_like_obj = Like.objects.get_or_create(user=user, post=post)
+    if created_like_obj:
+        return True
+    getted_like_obj.delete()
+    return False
