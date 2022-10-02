@@ -1,6 +1,15 @@
 from posts.serializers import PostSerializer
 from posts.models import Post
 
+def read_posts():
+    """
+    Returns:
+        PostSerializer
+    """
+    posts = Post.objects.all().order_by('-created_date')
+    posts_serializer = PostSerializer(posts, many=True).data
+    return posts_serializer
+    
 def create_post(create_data):
     """
     Args:
@@ -17,3 +26,4 @@ def create_post(create_data):
     del tags_data_list[0]
     for tag in tags_data_list:
         Post.objects.last().tags.add(tag)
+        
