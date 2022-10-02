@@ -14,5 +14,5 @@ class PostView(APIView):
         return Response(posts, status=status.HTTP_200_OK)
     
     def post(self, request):
-        create_post(request.data)
+        create_post(request.data, request.user)
         return Response({'detail': '게시글이 작성되었습니다'}, status=status.HTTP_201_CREATED)

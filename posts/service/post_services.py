@@ -10,14 +10,18 @@ def read_posts():
     posts_serializer = PostSerializer(posts, many=True).data
     return posts_serializer
     
-def create_post(create_data):
+def create_post(create_data, user):
     """
     Args:
-        "writer" : post의 writer,
-        "title" : post의 title,
-        "content" : post의 content,
-        "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
+        create_data : {
+            "writer" : post의 writer,
+            "title" : post의 title,
+            "content" : post의 content,
+            "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
+            },
+        user : 글을 작성하는 현재 로그인이 되어있는 user
     """
+    create_data['writer'] = user.id
     post_data_serializer = PostSerializer(data=create_data)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
