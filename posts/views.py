@@ -8,6 +8,7 @@ from posts.service.post_services import (
     edit_post,
     deactivate_post,
     recover_post,
+    read_detail_post
 )
 
 class PostView(APIView):
@@ -31,3 +32,8 @@ class RecoverPostView(APIView):
     def post(self, request, post_id):
         recover_post(request.user, post_id)
         return Response({'detail': '게시글이 복구되었습니다'}, status=status.HTTP_200_OK)
+
+class PostDetailView(APIView):
+    def get(self, request, post_id):
+        post = read_detail_post(post_id)
+        return Response(post, status=status.HTTP_200_OK)

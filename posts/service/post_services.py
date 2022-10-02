@@ -79,3 +79,9 @@ def recover_post(user, post_id):
     if post.is_active == False:
         post.is_active = True
         post.save()
+        
+def read_detail_post(post_id):
+    post = Post.objects.get(id=post_id)
+    post.update_views
+    post_serializer = PostSerializer(post).data
+    return post_serializer
