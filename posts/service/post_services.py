@@ -68,3 +68,14 @@ def deactivate_post(user, post_id):
     post = Post.objects.get(id=post_id, writer_id=user)
     post.is_active = False
     post.save()
+    
+def recover_post(user, post_id):
+    """
+    Args:
+        user : users.User FK | 작성한 사용자
+        post_id : 복구하고자 하는 게시글의 id
+    """
+    post = Post.objects.get(id=post_id, writer_id=user)
+    if post.is_active == False:
+        post.is_active = True
+        post.save()

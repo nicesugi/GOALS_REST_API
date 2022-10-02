@@ -7,8 +7,9 @@ from posts.service.post_services import (
     create_post,
     edit_post,
     deactivate_post,
+    recover_post,
 )
-from posts.models import Post
+
 class PostView(APIView):
     def get(self, request):
         posts = read_posts()
@@ -25,3 +26,8 @@ class PostView(APIView):
     def delete(self, request, post_id):
         deactivate_post(request.user, post_id)
         return Response({'detail': '게시글이 비활성화가 되었습니다'}, status=status.HTTP_200_OK)
+    
+class RecoverPostView(APIView):
+    def post(self, request, post_id):
+        recover_post(request.user, post_id)
+        return Response({'detail': '게시글이 복구되었습니다'}, status=status.HTTP_200_OK)
