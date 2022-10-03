@@ -55,8 +55,8 @@ class PostDetailView(APIView):
 
 class LikeView(APIView):
     def post(self, request, post_id):
-        like_count = Like.objects.filter(post=post_id).count()
         if like_post(request.user, post_id):
+            like_count = Like.objects.filter(post=post_id).count()
             return Response({'detail': '좋아요 했습니다', 'like_count': like_count}, status=status.HTTP_200_OK)
         return Response({'detail': '좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
         

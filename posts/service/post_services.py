@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Count, Q
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
 
@@ -15,8 +15,10 @@ def read_posts(order_by, reverse):
         reverse = '-'
     elif reverse == 0:
         reverse = ''
-        
-    posts = Post.objects.all().order_by(reverse + order_by)
+    if order_by == 'created_date' or order_by == 'views': 
+        posts = Post.objects.all().order_by(reverse + order_by)
+    elif order_by == 'likes':
+        posts = Post.objects.all().annotate(like_count=Count('like')).order_by(reverse + 'like_count')
     return posts
 
 def search_posts(posts, search):
