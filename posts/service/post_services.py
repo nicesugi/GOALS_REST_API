@@ -1,3 +1,4 @@
+from django.db.models import Q
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
 
@@ -7,7 +8,7 @@ def read_posts(order_by, reverse):
         order_by : 작성일, 조회수 중 1개
         reverse : 1 > 내림차순  / 0 > 오름차순
     Returns:
-        PostSerializer
+        Post
     """
     
     if reverse == 1:
@@ -16,8 +17,21 @@ def read_posts(order_by, reverse):
         reverse = ''
         
     posts = Post.objects.all().order_by(reverse + order_by)
-    posts_serializer = PostSerializer(posts, many=True).data
-    return posts_serializer
+    return posts
+
+def search_posts(posts, search):
+    """
+    Args:
+        posts : 정렬이 완료된 게시글
+        search : 게시글 중 제목이나 내용에 해당 값이 들어있는 게시글만 반환
+
+    Returns:
+        Post
+    """
+    posts = posts.filter(
+        Q(title__icontains=search) | Q(content__icontains=search)
+    )
+    return posts
     
 def create_post(create_data, user):
     """

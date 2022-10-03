@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from posts.models import Like
 from posts.service.post_services import (
     read_posts,
+    search_posts,
     create_post,
     edit_post,
     deactivate_post,
@@ -17,8 +18,10 @@ class PostView(APIView):
     def get(self, request):
         order_by = self.request.query_params.get('order_by', 'created_date')
         reverse = int(self.request.query_params.get('reverse', 1))
-        
+        search = self.request.query_params.get('search')
+
         posts = read_posts(order_by, reverse)
+        posts = search_posts(posts, search)
         return Response(posts, status=status.HTTP_200_OK)
     
     def post(self, request):
