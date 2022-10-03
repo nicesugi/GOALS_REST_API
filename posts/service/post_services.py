@@ -46,7 +46,23 @@ def filtering_posts(posts, tags):
     for tag in tags:
         posts = posts.filter(tags__name=tag)
     return posts
+
+def pagination_posts(posts, page_size, page):
+    """
+    Args:
+        posts : 정렬, 검색, 필터링 된 게시글
+        page_size : 한 페이지에 보여지는 게시글 수
+        page : 보고자하는 페이지
+
+    Returns:
+        PostSerializer
+    """
+    start_post = page_size * (page-1)
+    end_post = page * page_size
+    posts_serializer = PostSerializer(posts[start_post:end_post], many=True).data
+    return posts_serializer
     
+
 def create_post(create_data, user):
     """
     Args:

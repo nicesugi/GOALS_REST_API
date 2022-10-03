@@ -7,6 +7,7 @@ from posts.service.post_services import (
     read_posts,
     search_posts,
     filtering_posts,
+    pagination_posts,
     create_post,
     edit_post,
     deactivate_post,
@@ -21,10 +22,13 @@ class PostView(APIView):
         reverse = int(self.request.query_params.get('reverse', 1))
         search = self.request.query_params.get('search')
         tags = self.request.query_params.get('tags')
-
+        page_size = int(self.request.query_params.get('page_size', 10))
+        page = int(self.request.query_params.get('page', 1))
+        
         posts = read_posts(order_by, reverse)
         posts = search_posts(posts, search)
         posts = filtering_posts(posts, tags)
+        posts = pagination_posts(posts, page_size, page)
         return Response(posts, status=status.HTTP_200_OK)
     
     def post(self, request):
