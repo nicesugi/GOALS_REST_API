@@ -32,6 +32,20 @@ def search_posts(posts, search):
         Q(title__icontains=search) | Q(content__icontains=search)
     )
     return posts
+
+def filtering_posts(posts, tags):
+    """
+    Args:
+        posts : 정렬과 검색이 된 게시글
+        tags : 게시글 중 해당 태그 값이 들어있는 게시글만 반환
+
+    Returns:
+        Post
+    """
+    tags = tags.split(',')
+    for tag in tags:
+        posts = posts.filter(tags__name=tag)
+    return posts
     
 def create_post(create_data, user):
     """
