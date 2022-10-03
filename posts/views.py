@@ -2,6 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from posts.models import Like
 from posts.service.post_services import (
     read_posts,
     create_post,
@@ -39,11 +40,11 @@ class PostDetailView(APIView):
         post = read_detail_post(post_id)
         return Response(post, status=status.HTTP_200_OK)
 
-
 class LikeView(APIView):
     def post(self, request, post_id):
+        like_count = Like.objects.filter(post=post_id).count()
         if like_post(request.user, post_id):
-            return Response({'detail': '좋아요 했습니다'}, status=status.HTTP_200_OK)
+            return Response({'detail': '좋아요 했습니다', 'like_count': like_count}, status=status.HTTP_200_OK)
         return Response({'detail': '좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
         
         
