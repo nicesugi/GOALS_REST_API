@@ -1,15 +1,70 @@
+from django.db.models import Count, Q
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
 
-def read_posts():
+def read_posts(order_by, reverse):
     """
+    Args:
+        order_by : 작성일, 조회수 중 1개
+        reverse : 1 > 내림차순  / 0 > 오름차순
+    Returns:
+        Post
+    """
+    
+    if reverse == 1:
+        reverse = '-'
+    elif reverse == 0:
+        reverse = ''
+    if order_by == 'created_date' or order_by == 'views': 
+        posts = Post.objects.all().order_by(reverse + order_by)
+    elif order_by == 'likes':
+        posts = Post.objects.all().annotate(like_count=Count('like')).order_by(reverse + 'like_count')
+    return posts
+
+def search_posts(posts, search):
+    """
+    Args:
+        posts : 정렬이 완료된 게시글
+        search : 게시글 중 제목이나 내용에 해당 값이 들어있는 게시글만 반환
+
+    Returns:
+        Post
+    """
+    posts = posts.filter(
+        Q(title__icontains=search) | Q(content__icontains=search)
+    )
+    return posts
+
+def filtering_posts(posts, tags):
+    """
+    Args:
+        posts : 정렬과 검색이 된 게시글
+        tags : 게시글 중 해당 태그 값이 들어있는 게시글만 반환
+
+    Returns:
+        Post
+    """
+    tags = tags.split(',')
+    for tag in tags:
+        posts = posts.filter(tags__name=tag)
+    return posts
+
+def pagination_posts(posts, page_size, page):
+    """
+    Args:
+        posts : 정렬, 검색, 필터링 된 게시글
+        page_size : 한 페이지에 보여지는 게시글 수
+        page : 보고자하는 페이지
+
     Returns:
         PostSerializer
     """
-    posts = Post.objects.all().order_by('-created_date')
-    posts_serializer = PostSerializer(posts, many=True).data
+    start_post = page_size * (page-1)
+    end_post = page * page_size
+    posts_serializer = PostSerializer(posts[start_post:end_post], many=True).data
     return posts_serializer
     
+
 def create_post(create_data, user):
     """
     Args:

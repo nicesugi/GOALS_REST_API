@@ -2,8 +2,12 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from posts.models import Like
 from posts.service.post_services import (
     read_posts,
+    search_posts,
+    filtering_posts,
+    pagination_posts,
     create_post,
     edit_post,
     deactivate_post,
@@ -14,7 +18,17 @@ from posts.service.post_services import (
 
 class PostView(APIView):
     def get(self, request):
-        posts = read_posts()
+        order_by = self.request.query_params.get('order_by', 'created_date')
+        reverse = int(self.request.query_params.get('reverse', 1))
+        search = self.request.query_params.get('search')
+        tags = self.request.query_params.get('tags')
+        page_size = int(self.request.query_params.get('page_size', 10))
+        page = int(self.request.query_params.get('page', 1))
+        
+        posts = read_posts(order_by, reverse)
+        posts = search_posts(posts, search)
+        posts = filtering_posts(posts, tags)
+        posts = pagination_posts(posts, page_size, page)
         return Response(posts, status=status.HTTP_200_OK)
     
     def post(self, request):
@@ -39,11 +53,11 @@ class PostDetailView(APIView):
         post = read_detail_post(post_id)
         return Response(post, status=status.HTTP_200_OK)
 
-
 class LikeView(APIView):
     def post(self, request, post_id):
         if like_post(request.user, post_id):
-            return Response({'detail': '좋아요 했습니다'}, status=status.HTTP_200_OK)
+            like_count = Like.objects.filter(post=post_id).count()
+            return Response({'detail': '좋아요 했습니다', 'like_count': like_count}, status=status.HTTP_200_OK)
         return Response({'detail': '좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
         
         
