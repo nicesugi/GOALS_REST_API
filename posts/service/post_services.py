@@ -1,12 +1,21 @@
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
 
-def read_posts():
+def read_posts(order_by, reverse):
     """
+    Args:
+        order_by : 작성일, 조회수 중 1개
+        reverse : 1 > 내림차순  / 0 > 오름차순
     Returns:
         PostSerializer
     """
-    posts = Post.objects.all().order_by('-created_date')
+    
+    if reverse == 1:
+        reverse = '-'
+    elif reverse == 0:
+        reverse = ''
+        
+    posts = Post.objects.all().order_by(reverse + order_by)
     posts_serializer = PostSerializer(posts, many=True).data
     return posts_serializer
     
