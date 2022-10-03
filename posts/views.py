@@ -15,7 +15,10 @@ from posts.service.post_services import (
 
 class PostView(APIView):
     def get(self, request):
-        posts = read_posts()
+        order_by = self.request.query_params.get('order_by', 'created_date')
+        reverse = int(self.request.query_params.get('reverse', 1))
+        
+        posts = read_posts(order_by, reverse)
         return Response(posts, status=status.HTTP_200_OK)
     
     def post(self, request):
