@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from posts.models import Like
-from posts.service.post_services import (
+from posts.services.post_services import (
     read_posts,
     search_posts,
     filtering_posts,
