@@ -1,6 +1,7 @@
 from django.db.models import Count, Q
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
+from users.models import User
 
 def read_posts(order_by, reverse):
     """
@@ -114,11 +115,14 @@ def edit_post(edit_data, user, post_id):
 
         return post_serializer.data
     
-def deactivate_post(user, post_id):
+def soft_delete_post(user: User, post_id: int) -> None:
     """
     Args:
-        user : users.User FK | 글을 비활성화하는 현재 로그인이 되어있는 user
-        post_id : 비활성화하고자 하는 게시글의 id
+        user (int) : 로그인이 되어있는 작성자의 FK
+        post_id (int) : 비활성화하고자 하는 게시글의 PK
+        
+    Returns:
+        None
     """
     post = Post.objects.get(id=post_id, writer_id=user)
     post.is_active = False
@@ -134,7 +138,19 @@ def recover_post(user, post_id):
     if post.is_active == False:
         post.is_active = True
         post.save()
+
+def hard_delete_post(user: User, post_id: int) -> None:
+    """
+    Args:
+        user (int) : 로그인이 되어있는 작성자의 FK
+        post_id (int) : 완전 삭제하고자 하는 게시글의 PK
         
+    Returns:
+        None
+    """
+    post = Post.objects.get(id=post_id, writer_id=user)
+    post.delete()
+    
 def read_detail_post(post_id):
     """
     Args:
