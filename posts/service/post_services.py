@@ -1,17 +1,19 @@
 from django.db.models import Count, Q
+from typing import Dict
+
 from posts.serializers import PostSerializer, PostDetailSerializer
 from posts.models import Like, Post
 from users.models import User
 
-def read_posts(order_by, reverse):
+def read_posts(order_by: str, reverse: int) -> Post:
     """
     Args:
-        order_by : 작성일, 조회수 중 1개
-        reverse : 1 > 내림차순  / 0 > 오름차순
+        order_by (str) : 정렬 기준 (작성일, 조회수, 좋아요수 중 1개)
+        reverse (int) : 정렬 기준(1-내림차순 / 0-오름차순)
+        
     Returns:
-        Post
+        Post : 정렬(작성일/조회수/좋아요수/내림차순/오름차순)이 된 게시글의 QuerySet
     """
-    
     if reverse == 1:
         reverse = '-'
     elif reverse == 0:
@@ -22,60 +24,62 @@ def read_posts(order_by, reverse):
         posts = Post.objects.all().annotate(like_count=Count('like')).order_by(reverse + 'like_count')
     return posts
 
-def search_posts(posts, search):
+def search_posts(posts: Post, search: str) -> Post:
     """
     Args:
-        posts : 정렬이 완료된 게시글
-        search : 게시글 중 제목이나 내용에 해당 값이 들어있는 게시글만 반환
+        posts (QuerySet) : 정렬이 된 게시글
+        search (str) : 검색 키워드
 
     Returns:
-        Post
+        Post : 정렬,검색이 된 게시글의 QuerySet
     """
     posts = posts.filter(
         Q(title__icontains=search) | Q(content__icontains=search)
     )
     return posts
 
-def filtering_posts(posts, tags):
+def filtering_posts(posts: Post, tags: str) -> Post:
     """
     Args:
-        posts : 정렬과 검색이 된 게시글
-        tags : 게시글 중 해당 태그 값이 들어있는 게시글만 반환
+        posts (QuerySet) : 정렬,검색이 된 게시글
+        tags (str) : 필터링할 해시태그
 
     Returns:
-        Post
+        Post : 정렬,검색,태그필터링이 된 게시글의 QuerySet
     """
     tags = tags.split(',')
     for tag in tags:
         posts = posts.filter(tags__name=tag)
     return posts
 
-def pagination_posts(posts, page_size, page):
+def pagination_posts(posts: Post, page_size: int, page: int) -> PostSerializer:
     """
     Args:
-        posts : 정렬, 검색, 필터링 된 게시글
-        page_size : 한 페이지에 보여지는 게시글 수
-        page : 보고자하는 페이지
+        posts (QuerySet) : 정렬,검색,태그필터링이 된 게시글
+        page_size (int) : 한 페이지에 보여지는 게시글 수
+        page (int) : 보고자하는 페이지
 
     Returns:
-        PostSerializer
+        PostSerializer : 정렬,검색,태그필터링,페이징이 된 게시글들
     """
     start_post = page_size * (page-1)
     end_post = page * page_size
     posts_serializer = PostSerializer(posts[start_post:end_post], many=True).data
     return posts_serializer
-    
 
-def create_post(create_data, user):
+def create_post(create_data: Dict[str, str], user: User) -> None:
     """
     Args:
-        create_data : {
-            "writer" : post의 writer,
+        create_data (Dict[str, str]) : {
+            "writer" : user,
             "title" : post의 title,
             "content" : post의 content,
-            "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
-            },
-        user : users.User FK | 글을 작성하는 현재 로그인이 되어있는 user
+            "tags" : post의 hashtags /예시)"#제목,#내용,#태그"
+            }
+        user (int) : 로그인이 되어있는 작성자의 FK
+        
+    Returns:
+        None
     """
     create_data['writer'] = user.id
     post_data_serializer = PostSerializer(data=create_data)
@@ -87,23 +91,21 @@ def create_post(create_data, user):
     for tag in tags_data_list:
         Post.objects.last().tags.add(tag)
         
-def edit_post(edit_data, user, post_id):
+def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     """
     Args:
-        edit_data : {
+        edit_data (Dict[str, str]) : {
             "title" : post의 title,
             "content" : post의 content,
-            "tags" : post의 hashtags, 예시)"#제목,#내용,#태그"
+            "tags" : post의 hashtags /예시)"#제목,#내용,#태그"
             }
-        user : users.User FK | 글을 수정하는 현재 로그인이 되어있는 user
-        post_id : 수정하고자 하는 게시글의 id
+        user (int) : 로그인이 되어있는 작성자의 FK
+        post_id (int) : 수정하고자 하는 게시글의 PK
 
     Returns:
-        PostSerializer
+        None
     """
-    edit_data['writer'] = user.id
-    post = Post.objects.get(id=post_id)
-    
+    post = Post.objects.get(id=post_id, writer_id=user)
     post_serializer = PostSerializer(post, data=edit_data, partial=True)
     if post_serializer.is_valid(raise_exception=True):
         post_serializer.save()
@@ -112,8 +114,6 @@ def edit_post(edit_data, user, post_id):
         del tags_data_list[0]
         for tag in tags_data_list:
             post.tags.add(tag)
-
-        return post_serializer.data
     
 def soft_delete_post(user: User, post_id: int) -> None:
     """
@@ -128,17 +128,20 @@ def soft_delete_post(user: User, post_id: int) -> None:
     post.is_active = False
     post.save()
     
-def recover_post(user, post_id):
+def recover_post(user: User, post_id: int) -> None:
     """
     Args:
-        user : users.User FK | 작성한 사용자
-        post_id : 복구하고자 하는 게시글의 id
+        user (int) : 로그인이 되어있는 작성자의 FK
+        post_id (int) : 복구하고자 하는 게시글의 PK
+        
+    Returns:
+        None
     """
     post = Post.objects.get(id=post_id, writer_id=user)
     if post.is_active == False:
         post.is_active = True
         post.save()
-
+        
 def hard_delete_post(user: User, post_id: int) -> None:
     """
     Args:
@@ -151,27 +154,27 @@ def hard_delete_post(user: User, post_id: int) -> None:
     post = Post.objects.get(id=post_id, writer_id=user)
     post.delete()
     
-def read_detail_post(post_id):
+def read_detail_post(post_id: int) -> PostDetailSerializer:
     """
     Args:
-        post_id : 자세한 내용을 열람하고자 하는 게시글의 id
+        post_id (int) : 자세한 내용을 열람하고자 하는 게시글의 PK
 
     Returns:
-        PostDetailSerializer
+        PostDetailSerializer : 해당 게시글의 상세정보
     """
     post = Post.objects.get(id=post_id)
     post.update_views
     post_serializer = PostDetailSerializer(post).data
     return post_serializer
 
-def like_post(user, post_id):
+def like_post(user: User, post_id: int) -> bool:
     """
     Args:
-        user : users.User FK | 좋아요/좋아요취소 하는 사용자
-        post_id : 좋아요/좋아요취소 하는 게시글의 id
+        user (int) : 좋아요/좋아요취소 하는 사용자의 FK
+        post_id (int) : 좋아요/좋아요취소 하는 게시글의 PK
 
     Returns:
-        True : "좋아요",
+        True : "좋아요"
         False : "좋아요취소" 
     """
     post = Post.objects.get(id=post_id)
