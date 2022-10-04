@@ -67,7 +67,7 @@
 
 ## API 명세서
 
- <img width="785" src="https://user-images.githubusercontent.com/104303285/193577481-0b27e5d8-b578-4435-bf9d-a8abea9e3620.png" />
+ <img width="785" src="https://user-images.githubusercontent.com/104303285/193740266-209d4b7a-544a-43d3-a82c-be662118d043.png" />
 
 ## 컨벤션
 
