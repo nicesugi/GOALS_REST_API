@@ -89,7 +89,7 @@ def create_post(create_data: Dict[str, str], user: User) -> None:
     tags_data_list = create_data['tags'].replace(',' , '').split('#')
     del tags_data_list[0]
     for tag in tags_data_list:
-        Post.objects.last().tags.add(tag)
+        post_data_serializer.instance.tags.add(tag)
         
 def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     """
