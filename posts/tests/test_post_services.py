@@ -8,7 +8,6 @@ from posts.services.post_services import (
     create_post,
 )
 
-
 class TestService(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -26,7 +25,6 @@ class TestService(TestCase):
         """
         user = User.objects.get(username = 'test_user')
         create_data = {
-            'writer' : user.id,
             'title' : 'test_title',
             'content' : 'test_content',
             'tags' : '#sns, #like, #post'}
@@ -36,6 +34,29 @@ class TestService(TestCase):
         with self.assertNumQueries(39):
             create_post(create_data, user)
             
+    def test_fail_create_post_without_arg_user(self):
+        """
+        게시물을 작성하는 create_post service 검증
+        case : 인자 값 중 user가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        create_data = {
+            'title' : 'test_title',
+            'content' : 'test_content',
+            'tags' : '#sns, #like, #post'}
+        with self.assertRaises(TypeError):
+            create_post(create_data)
+            
+    def test_fail_create_post_without_arg_create_data(self):
+        """
+        게시물을 작성하는 create_post service 검증
+        case : 인자 값 중 create_data가 들어오지 않을 경우 
+        result : 실패/TypeError 발생        
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(TypeError):
+            create_post(user)
+        
     def test_fail_create_post_without_title(self):
         """
         게시물을 작성하는 create_post service 검증
@@ -44,7 +65,6 @@ class TestService(TestCase):
         """
         user = User.objects.get(username = 'test_user')
         create_data = {
-            'writer' : user.id,
             'title' : '',
             'content' : 'test_content',
             'tags' : '#sns, #like, #post'}
@@ -59,7 +79,6 @@ class TestService(TestCase):
         """
         user = User.objects.get(username = 'test_user')
         create_data = {
-            'writer' : user.id,
             'title' : 'test_title',
             'content' : '',
             'tags' : '#sns, #like, #post'}
@@ -74,7 +93,6 @@ class TestService(TestCase):
         """
         user = User.objects.get(username = 'test_user')
         create_data = {
-            'writer' : user.id,
             'title' : 'test_title',
             'content' : 'test_content',
             'tags' : ''}
