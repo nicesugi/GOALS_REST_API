@@ -42,7 +42,7 @@ class TestService(TestCase):
         # ctx.captured_queries
         with self.assertNumQueries(39):
             create_post(create_data, user)
-            
+    
     def test_fail_create_post_without_arg_user(self):
         """
         게시물을 작성하는 create_post service 검증
@@ -114,6 +114,41 @@ class TestService(TestCase):
         after_all_post_count = Post.objects.all().count()
         self.assertEqual(all_post_count, after_all_post_count-1)
 
+    def test_fail_create_post_over_max_length_of_title(self):
+        """
+        게시물을 작성하는 create_post service 검증
+        case : title값이 길이 제한인 50자를 넘었을 경우
+        result : 실패/ValidationError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        create_data = {
+            'title' : 'testtesttesttesttesttesttesttesttesttesttesttesttest',
+            'content' : 'test_content',
+            'tags' : '#sns, #like, #post'
+            }
+        with self.assertRaises(exceptions.ValidationError):
+            create_post(create_data, user)
+            
+    def test_fail_create_post_over_max_length_of_content(self):
+        """
+        게시물을 작성하는 create_post service 검증
+        case : content값이 길이 제한인 400자를 넘었을 경우
+        result : 실패/ValidationError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        create_data = {
+            'title' : 'test_title',
+            'content' : 'testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest',
+            'tags' : '#sns, #like, #post'
+            }
+        with self.assertRaises(exceptions.ValidationError):
+            create_post(create_data, user)
+            
     def test_edit_post(self):
         """
         게시물을 수정하는 edit_post service 검증
@@ -220,3 +255,40 @@ class TestService(TestCase):
         edit_post(edit_data, user, post.id)
         edited_post = Post.objects.get(id = post.id)
         self.assertEqual(edit_data['title'], edited_post.title)
+        
+    def test_fail_edit_post_over_max_length_of_title(self):
+        """
+        게시물을 수정하는 edit_post service 검증
+        case : title값이 길이 제한인 50자를 넘었을 경우
+        result : 실패/ValidationError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        post = Post.objects.get(writer = user, title = 'test_title')
+        edit_data = {
+            'title' : 'testtesttesttesttesttesttesttesttesttesttesttesttest',
+            'content' : 'test_edit_content',
+            'tags' : '#edit_sns, #edit_like, #edit_post'
+            }
+        with self.assertRaises(exceptions.ValidationError):
+            edit_post(edit_data, user, post.id)
+            
+    def test_fail_edit_post_over_max_length_of_content(self):
+        """
+        게시물을 작성하는 create_post service 검증
+        case : content값이 길이 제한인 400자를 넘었을 경우
+        result : 실패/ValidationError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        post = Post.objects.get(writer = user, title = 'test_title')
+        edit_data = {
+            'title' : 'test_edit_title',
+            'content' : 'testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest\
+                        testtesttesttesttesttesttesttesttesttesttesttesttest',
+            'tags' : '#edit_sns, #edit_like, #edit_post'
+            }
+        with self.assertRaises(exceptions.ValidationError):
+            edit_post(edit_data, user, post.id)
