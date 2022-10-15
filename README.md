@@ -1,5 +1,6 @@
 # Social_Networking_Service
 
+### 목차
 [1. 기능명세서](#기능명세서) <br>
 [2. 기술스택](#기술-스택) <br>
 [3. ERD](#erd) <br>
