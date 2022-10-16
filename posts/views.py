@@ -49,7 +49,7 @@ class PostView(APIView):
             return Response({'detail':'제목이나 내용을 확인해주세요'}, 
                             status=status.HTTP_400_BAD_REQUEST)
         except TypeError:
-            return Response({'detail':'입력값이 잘못되었습니다. 로그인이나 작성내용을 확인해주세요'}, 
+            return Response({'detail':'입력값이 잘못되었습니다. 로그인상태나 작성내용을 확인해주세요'}, 
                             status=status.HTTP_400_BAD_REQUEST)
         
     def put(self, request, post_id):
@@ -64,13 +64,20 @@ class PostView(APIView):
             return Response({'detail':'제목이나 내용을 확인해주세요'}, 
                             status=status.HTTP_400_BAD_REQUEST)
         except TypeError:
-            return Response({'detail':'입력값이 잘못되었습니다. 로그인이나 수정내용을 확인해주세요'}, 
+            return Response({'detail':'입력값이 잘못되었습니다. 로그인상태나 수정내용을 확인해주세요'}, 
                             status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request, post_id):
-        soft_delete_post(request.user, post_id)
-        return Response({'detail':'게시글이 비활성화가 되었습니다'}, 
+        if request.user.is_anonymous:
+            return Response({'detail':'로그인을 해주세요'}, 
+                            status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            soft_delete_post(request.user, post_id)
+            return Response({'detail':'게시글이 비활성화가 되었습니다'}, 
                         status=status.HTTP_200_OK)
+        except TypeError:
+            return Response({'detail':'입력값이 잘못되었습니다. 로그인상태나 게시글을 확인해주세요'},
+                            status=status.HTTP_400_BAD_REQUEST)
     
 class ExistencePostView(APIView):
     """
