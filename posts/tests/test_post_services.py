@@ -1,13 +1,15 @@
+from django.db import connection
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext 
-from django.db import connection
 from rest_framework import exceptions
-from users.models import User
+
 from posts.models import Post
 from posts.services.post_services import (
     create_post,
     edit_post,
+    soft_delete_post,
 )
+from users.models import User
 
 class TestService(TestCase):
     @classmethod
@@ -22,7 +24,8 @@ class TestService(TestCase):
             writer = user,
             title = 'test_title',
             content = 'test_content',
-            tags = '#sns, #like, #post'
+            tags = '#sns, #like, #post',
+            is_active = True
             )
         
     def test_create_post(self):
@@ -274,7 +277,7 @@ class TestService(TestCase):
             
     def test_fail_edit_post_over_max_length_of_content(self):
         """
-        게시물을 작성하는 create_post service 검증
+        게시물을 수정하는 edit_post service 검증
         case : content값이 길이 제한인 400자를 넘었을 경우
         result : 실패/ValidationError 발생
         """
@@ -292,3 +295,35 @@ class TestService(TestCase):
             }
         with self.assertRaises(exceptions.ValidationError):
             edit_post(edit_data, user, post.id)
+                
+    def test_soft_delete_post(self):
+        """
+        게시물을 삭제(비활성화)하는 soft_delete_post service 검증
+        case : 정상적으로 작동 했을 경우
+        result : 정상/Post object를 삭제(비활성화)
+        """
+        user = User.objects.get(username = 'test_user')
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        soft_delete_post(user, post.id)
+        soft_deleted_post = Post.objects.get(id = post.id)
+        self.assertFalse(soft_deleted_post.is_active)
+        
+    def test_fail_soft_delete_post_without_arg_user(self):
+        """
+        게시물을 삭제(비활성화)하는 soft_delete_post service 검증
+        case : 인자 값 중 user가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        with self.assertRaises(TypeError):
+            soft_delete_post(post.id)
+            
+    def test_fail_soft_delete_post_without_arg_post_id(self):
+        """
+        게시물을 삭제(비활성화)하는 soft_delete_post service 검증
+        case : 인자 값 중 post_id가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(TypeError):
+            soft_delete_post(user)
