@@ -1,7 +1,7 @@
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from posts.models import Like
+from posts.models import Like, Post
 from posts.services.post_services import (
     read_posts,
     search_posts,
@@ -66,6 +66,9 @@ class PostView(APIView):
         except TypeError:
             return Response({'detail':'로그인상태나 수정내용을 확인해주세요'}, 
                             status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
     
     def delete(self, request, post_id):
         if request.user.is_anonymous:
@@ -78,6 +81,9 @@ class PostView(APIView):
         except TypeError:
             return Response({'detail':'로그인상태나 게시글을 확인해주세요'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
     
 class ExistencePostView(APIView):
     """
@@ -95,11 +101,24 @@ class ExistencePostView(APIView):
         except TypeError:
             return Response({'detail':'로그인상태나 게시글을 확인해주세요'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
     
     def delete(self, request, post_id):
-        hard_delete_post(request.user, post_id)
-        return Response({'detail':'게시글이 삭제되었습니다'}, status=status.HTTP_200_OK)
-
+        if request.user.is_anonymous:
+            return Response({'detail':'로그인을 해주세요'}, 
+                            status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            hard_delete_post(request.user, post_id)
+            return Response({'detail':'게시글이 삭제되었습니다'}, 
+                            status=status.HTTP_200_OK)
+        except TypeError:
+            return Response({'detail':'로그인상태나 게시글을 확인해주세요'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
 class PostDetailView(APIView):
     """
     get : 게시글 상세 조회
