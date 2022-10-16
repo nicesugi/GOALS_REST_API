@@ -297,6 +297,16 @@ class TestService(TestCase):
             }
         with self.assertRaises(exceptions.ValidationError):
             edit_post(edit_data, user, post.id)
+            
+    def test_fail_edit_post_the_post_not_exist(self):
+        """
+        게시물을 수정하는 edit_post service 검증
+        case : 없는 post를 수정할 경우 
+        result : 실패/DoesNotExist 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(Post.DoesNotExist):
+            recover_post(user, post_id=10000)
                 
     def test_soft_delete_post(self):
         """
@@ -329,7 +339,17 @@ class TestService(TestCase):
         user = User.objects.get(username = 'test_user')
         with self.assertRaises(TypeError):
             soft_delete_post(user)
-
+            
+    def test_fail_soft_delete_post_the_post_not_exist(self):
+        """
+        게시물을 삭제(비활성화)하는 soft_delete_post service 검증
+        case : 없는 post를 삭제(비활성)할 경우 
+        result : 실패/DoesNotExist 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(Post.DoesNotExist):
+            recover_post(user, post_id=10000)
+            
     def test_recover_post(self):
         """
         비활성화된 게시글 복구하는 recover_post service 검증
@@ -361,6 +381,16 @@ class TestService(TestCase):
         user = User.objects.get(username = 'test_user')
         with self.assertRaises(TypeError):
             recover_post(user)
+            
+    def test_fail_recover_post_the_post_not_exist(self):
+        """
+        비활성화된 게시글 복구하는 recover_post service 검증
+        case : 없는 post를 복구할 경우 
+        result : 실패/DoesNotExist 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(Post.DoesNotExist):
+            recover_post(user, post_id=10000)
     
     def test_hard_delete_post(self):
         """
