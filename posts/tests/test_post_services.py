@@ -8,6 +8,7 @@ from posts.services.post_services import (
     create_post,
     edit_post,
     soft_delete_post,
+    recover_post,
 )
 from users.models import User
 
@@ -327,3 +328,35 @@ class TestService(TestCase):
         user = User.objects.get(username = 'test_user')
         with self.assertRaises(TypeError):
             soft_delete_post(user)
+
+    def test_recover_post(self):
+        """
+        비활성화된 게시글 복구하는 recover_post service 검증
+        case : 정상적으로 작동 했을 경우
+        result : 정상/Post object를 활성화
+        """
+        user = User.objects.get(username = 'test_user')
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        recover_post(user, post.id)
+        recovered_post = Post.objects.get(id = post.id)
+        self.assertTrue(recovered_post.is_active)
+        
+    def test_fail_recover_post_without_arg_user(self):
+        """
+        비활성화된 게시글 복구하는 recover_post service 검증
+        case : 인자 값 중 user가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        with self.assertRaises(TypeError):
+            recover_post(post.id)
+            
+    def test_fail_recover_post_without_arg_post_id(self):
+        """
+        비활성화된 게시글 복구하는 recover_post service 검증
+        case : 인자 값 중 post_id가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(TypeError):
+            recover_post(user)
