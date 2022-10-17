@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
 
-    'taggit.apps.TaggitAppConfig',
-    'taggit_templatetags2',
     'users',
     'posts',
 ]
@@ -58,7 +56,6 @@ REST_FRAMEWORK = {
     ]
 }
 
-TAGGIT_CASE_INSENSITIVE = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
