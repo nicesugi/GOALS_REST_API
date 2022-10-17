@@ -4,7 +4,7 @@ from taggit.managers import TaggableManager
 class Post(models.Model):
     writer = models.ForeignKey('users.User', verbose_name='작성자', on_delete=models.CASCADE)
     title = models.CharField('제목', max_length=50)
-    content = models.TextField('내용', max_length=2000)
+    content = models.TextField('내용', max_length=400)
     tags = TaggableManager(verbose_name='해쉬태그', blank=True) 
     views = models.PositiveIntegerField('조회수', default=0)
     created_date = models.DateTimeField('생성시간', auto_now_add=True)
