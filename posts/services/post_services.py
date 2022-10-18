@@ -1,8 +1,9 @@
 from django.db.models import Count, Q
 from typing import Dict
-
+from posts.models import (
+    Like, Post, TagName,
+    )
 from posts.serializers import PostSerializer, PostDetailSerializer
-from posts.models import Like, Post
 from users.models import User
 
 def read_posts(order_by: str, reverse: int) -> Post:
@@ -47,10 +48,14 @@ def filtering_posts(posts: Post, tags: str) -> Post:
     Returns:
         Post : 정렬,검색,태그필터링이 된 게시글의 QuerySet
     """
-    tags = tags.split(',')
-    for tag in tags:
-        posts = posts.filter(tags__name=tag)
-    return posts
+    if tags == '':
+        query_set = posts.all()
+    else:    
+        tags = tags.split(',')
+        query_set = posts.none()
+        for tag in tags:
+            query_set = query_set | posts.filter(posttag__tags__name__icontains=tag).distinct()
+    return query_set
 
 def pagination_posts(posts: Post, page_size: int, page: int) -> PostSerializer:
     """
@@ -85,12 +90,13 @@ def create_post(create_data: Dict[str, str], user: User) -> None:
     post_data_serializer = PostSerializer(data=create_data)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
-
+    
     tags_data_list = create_data['tags'].replace(',' , '').split('#')
     del tags_data_list[0]
     for tag in tags_data_list:
-        post_data_serializer.instance.tags.add(tag)
-        
+        TagName.objects.get_or_create(name=tag)
+        post_data_serializer.instance.tags.add(TagName.objects.get(name=tag))
+    
 def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     """
     Args:
@@ -110,10 +116,11 @@ def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     if post_serializer.is_valid(raise_exception=True):
         post_serializer.save()
         
-        tags_data_list = edit_data['tags'].replace(',' , '').split('#')
-        del tags_data_list[0]
-        for tag in tags_data_list:
-            post.tags.add(tag)
+    tags_data_list = edit_data['tags'].replace(',' , '').split('#')
+    del tags_data_list[0]
+    for tag in tags_data_list:
+        TagName.objects.get_or_create(name=tag)
+        post_serializer.instance.tags.add(TagName.objects.get(name=tag))
     
 def soft_delete_post(user: User, post_id: int) -> None:
     """
