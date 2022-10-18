@@ -1,11 +1,16 @@
 from django.db import models
-from taggit.managers import TaggableManager
 
+class TagName(models.Model):
+    name = models.CharField('해쉬태그', max_length=20)
+    
+    def __str__(self):
+        return self.name
+    
 class Post(models.Model):
     writer = models.ForeignKey('users.User', verbose_name='작성자', on_delete=models.CASCADE)
     title = models.CharField('제목', max_length=50)
     content = models.TextField('내용', max_length=400)
-    tags = TaggableManager(verbose_name='해쉬태그', blank=True) 
+    tags = models.ManyToManyField(TagName, verbose_name="해쉬태그", related_name="tags", through="PostTag")
     views = models.PositiveIntegerField('조회수', default=0)
     created_date = models.DateTimeField('생성시간', auto_now_add=True)
     updated_date = models.DateTimeField('수정시간', auto_now=True)
@@ -18,6 +23,13 @@ class Post(models.Model):
     def update_views(self):
         self.views = self.views + 1
         self.save()
+       
+class PostTag(models.Model):
+    tags = models.ForeignKey(TagName, on_delete=models.CASCADE)
+    posts = models.ForeignKey(Post, on_delete=models.CASCADE)
+    
+    class Meta:
+        db_table = "posts_tags"
         
 class Like(models.Model):
     user = models.ForeignKey('users.User', verbose_name='사용자', on_delete=models.CASCADE)
