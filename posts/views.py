@@ -26,16 +26,23 @@ class PostView(APIView):
     def get(self, request):
         order_by = self.request.query_params.get('order_by', 'created_date')
         reverse = int(self.request.query_params.get('reverse', 1))
-        search = self.request.query_params.get('search')
-        tags = self.request.query_params.get('tags')
+        search = self.request.query_params.get('search', '')
+        tags = self.request.query_params.get('tags', '')
         page_size = int(self.request.query_params.get('page_size', 10))
         page = int(self.request.query_params.get('page', 1))
         
-        posts = read_posts(order_by, reverse)
-        posts = search_posts(posts, search)
-        posts = filtering_posts(posts, tags)
-        posts = pagination_posts(posts, page_size, page)
-        return Response(posts, status=status.HTTP_200_OK)
+        try:
+            posts = read_posts(order_by, reverse)
+            posts = search_posts(posts, search)
+            posts = filtering_posts(posts, tags)
+            posts = pagination_posts(posts, page_size, page)
+            return Response(posts, status=status.HTTP_200_OK)
+        except TypeError:
+            return Response({'detail':'로그인상태나 작성내용을 확인해주세요'}, 
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
     
     def post(self, request):
         if request.user.is_anonymous:
