@@ -76,7 +76,6 @@ def create_post(create_data: Dict[str, str], user: User) -> None:
     """
     Args:
         create_data (Dict[str, str]) : {
-            "writer" : user,
             "title" : post의 title,
             "content" : post의 content,
             "tags" : post의 hashtags /예시)"#제목,#내용,#태그"
