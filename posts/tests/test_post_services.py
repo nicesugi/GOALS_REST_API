@@ -14,6 +14,7 @@ from posts.services.post_services import (
     soft_delete_post,
     recover_post,
     hard_delete_post,
+    like_post
 )
 from users.models import User
 
@@ -77,7 +78,7 @@ class TestService(TestCase):
         like_data3 = Like.objects.create(post = created_data2, user = user3)
         like_data4 = Like.objects.create(post = created_data2, user = user)
         like_data5 = Like.objects.create(post = created_data2, user = user2)
-        like_data6 = Like.objects.create(post = created_data, user = user)
+        like_data6 = Like.objects.create(post = created_data3, user = user)
     
     def test_read_posts_case_created_date_n_reverse(self):
         """
@@ -691,4 +692,60 @@ class TestService(TestCase):
         user = User.objects.get(username = 'test_user')
         with self.assertRaises(Post.DoesNotExist):
             recover_post(user, post_id=10000)
+    
+    def test_like_post_case_true(self):
+        """
+        게시글 좋아요 + 좋아요 수 카운트 like_post service 검증
+        case : 정상적으로 작동 했을 경우
+        result : 정상/결과값이 True가 나와 좋아요 등록하고 좋아요 수를 카운트 +1
+        """
+        user = User.objects.get(username = 'test_user')
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        like_post(user, post.id)
+        self.assertEqual(like_post(user, post.id), True)
+        created_like_obj_count = Post.objects.get(id=1).like_set.count()
+        self.assertEqual(created_like_obj_count, 1)
+    
+    def test_like_post_case_false(self):
+        """
+        게시글 좋아요취소 + 좋아요 수 카운트 like_post service 검증
+        case : 정상적으로 작동 했을 경우
+        result : 정상/결과값이 False가 나와 좋아요 취소하고 좋아요 수 카운트 -1
+        """
+        user = User.objects.get(username = 'test_user2')
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        like_post(user, post.id)
+        self.assertEqual(like_post(user, post.id), False)
+        getted_like_obj_count = Post.objects.get(id=1).like_set.count()
+        self.assertEqual(getted_like_obj_count-1, 0)
+        
+    def test_fail_like_post_without_arg_user(self):
+        """
+        게시글 좋아요/좋아요취소 + 좋아요 수 카운트 like_post service 검증
+        case : 인자 값 중 user가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        with self.assertRaises(TypeError):
+            like_post(post.id)
+    
+    def test_fail_like_post_without_arg_post_id(self):
+        """
+        게시글 좋아요/좋아요취소 + 좋아요 수 카운트 like_post service 검증
+        case : 인자 값 중 post_id가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(TypeError):
+            like_post(user)
+            
+    def test_fail_like_post_the_post_not_exist(self):
+        """
+        게시글 좋아요/좋아요취소 + 좋아요 수 카운트 like_post service 검증
+        case : 없는 post에 좋아요를 등록할 경우 
+        result : 실패/DoesNotExist 발생
+        """
+        user = User.objects.get(username = 'test_user')
+        with self.assertRaises(Post.DoesNotExist):
+            like_post(user, post_id=10000)
             
