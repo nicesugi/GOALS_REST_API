@@ -14,6 +14,7 @@ from posts.services.post_services import (
     soft_delete_post,
     recover_post,
     hard_delete_post,
+    read_detail_post,
     like_post
 )
 from users.models import User
@@ -749,3 +750,31 @@ class TestService(TestCase):
         with self.assertRaises(Post.DoesNotExist):
             like_post(user, post_id=10000)
             
+    def test_read_detail_post(self):
+        """
+        게시글 상세 조회 read_detail_post service 검증
+        case : 정상적으로 작동 했을 경우
+        result : 정상/게시글의 조회수가 업데이트됨을 확인하여 해당 게시글 조회
+        """
+        post = Post.objects.get(title = 'test_title', content = 'test_content')
+        post_views = read_detail_post(post.id)['views']
+        post_views_updated = read_detail_post(post.id)['views']
+        self.assertEqual(post_views+1, post_views_updated)
+        
+    def test_read_detail_post_without_arg_post_id(self):
+        """
+        게시글 상세 조회 read_detail_post service 검증
+        case : 인자 값 중 post_id가 들어오지 않을 경우 
+        result : 실패/TypeError 발생
+        """
+        with self.assertRaises(TypeError):
+            read_detail_post()
+            
+    def test_read_detail_post_the_post_not_exist(self):
+        """
+        게시글 상세 조회 read_detail_post service 검증
+        case : 없는 post에 좋아요를 등록할 경우 
+        result : 실패/DoesNotExist 발생
+        """
+        with self.assertRaises(Post.DoesNotExist):
+            read_detail_post(post_id=10000)
