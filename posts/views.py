@@ -131,16 +131,36 @@ class PostDetailView(APIView):
     get : 게시글 상세 조회
     """
     def get(self, request, post_id):
-        post = read_detail_post(post_id)
-        return Response(post, status=status.HTTP_200_OK)
+        if request.user.is_anonymous:
+            return Response({'detail':'로그인을 해주세요'}, 
+                            status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            post = read_detail_post(post_id)
+            return Response(post, status=status.HTTP_200_OK)
+        except TypeError:
+            return Response({'detail':'로그인상태나 게시글을 확인해주세요'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
 
 class LikeView(APIView):
     """
     post : 게시글 좋아요/좋아요취소 + 좋아요 수 카운트
     """
     def post(self, request, post_id):
-        if like_post(request.user, post_id):
-            like_count = Like.objects.filter(post=post_id).count()
-            return Response({'detail':'좋아요 했습니다', 'like_count':like_count}, 
-                            status=status.HTTP_200_OK)
-        return Response({'detail':'좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
+        if request.user.is_anonymous:
+            return Response({'detail':'로그인을 해주세요'}, 
+                            status=status.HTTP_401_UNAUTHORIZED)
+        try:
+            if like_post(request.user, post_id):
+                like_count = Like.objects.filter(post=post_id).count()
+                return Response({'detail':'좋아요 했습니다', 'like_count':like_count}, 
+                                status=status.HTTP_200_OK)
+            return Response({'detail':'좋아요를 취소했습니다'}, status=status.HTTP_200_OK)
+        except TypeError:
+            return Response({'detail':'로그인상태나 게시글을 확인해주세요'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Post.DoesNotExist:
+            return Response({'detail':'존재하지 않는 게시글입니다'},
+                            status=status.HTTP_404_NOT_FOUND)
