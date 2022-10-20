@@ -1,10 +1,9 @@
 from django.db.models import Count, Q
 from typing import Dict
-from posts.models import (
-    Like, Post, TagName,
-    )
+from posts.models import (Like, Post, TagName)
 from posts.serializers import PostSerializer, PostDetailSerializer
 from users.models import User
+
 
 def read_posts(order_by: str, reverse: int) -> Post:
     """
@@ -19,11 +18,13 @@ def read_posts(order_by: str, reverse: int) -> Post:
         reverse = '-'
     elif reverse == 0:
         reverse = ''
-    if order_by == 'created_date' or order_by == 'views': 
+    if order_by == 'created_date' or order_by == 'views':
         posts = Post.objects.all().order_by(reverse + order_by)
     elif order_by == 'likes':
-        posts = Post.objects.all().annotate(like_count=Count('like')).order_by(reverse + 'like_count')
+        posts = Post.objects.all().annotate(like_count=Count('like')
+                                            ).order_by(reverse + 'like_count')
     return posts
+
 
 def search_posts(posts: Post, search: str) -> Post:
     """
@@ -39,6 +40,7 @@ def search_posts(posts: Post, search: str) -> Post:
     )
     return posts
 
+
 def filtering_posts(posts: Post, tags: str) -> Post:
     """
     Args:
@@ -50,12 +52,14 @@ def filtering_posts(posts: Post, tags: str) -> Post:
     """
     if tags == '':
         query_set = posts.all()
-    else:    
+    else:
         tags = tags.split(',')
         query_set = posts.none()
         for tag in tags:
-            query_set = query_set | posts.filter(posttag__tags__name__icontains=tag).distinct()
+            query_set = query_set | posts.filter(
+                posttag__tags__name__icontains=tag).distinct()
     return query_set
+
 
 def pagination_posts(posts: Post, page_size: int, page: int) -> PostSerializer:
     """
@@ -69,8 +73,10 @@ def pagination_posts(posts: Post, page_size: int, page: int) -> PostSerializer:
     """
     start_post = page_size * (page-1)
     end_post = page * page_size
-    posts_serializer = PostSerializer(posts[start_post:end_post], many=True).data
+    posts_serializer = PostSerializer(
+        posts[start_post:end_post], many=True).data
     return posts_serializer
+
 
 def create_post(create_data: Dict[str, str], user: User) -> None:
     """
@@ -89,13 +95,14 @@ def create_post(create_data: Dict[str, str], user: User) -> None:
     post_data_serializer = PostSerializer(data=create_data)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
-    
-    tags_data_list = create_data['tags'].replace(',' , '').split('#')
+
+    tags_data_list = create_data['tags'].replace(',', '').split('#')
     del tags_data_list[0]
     for tag in tags_data_list:
         TagName.objects.get_or_create(name=tag)
         post_data_serializer.instance.tags.add(TagName.objects.get(name=tag))
-    
+
+
 def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     """
     Args:
@@ -114,13 +121,14 @@ def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     post_serializer = PostSerializer(post, data=edit_data, partial=True)
     if post_serializer.is_valid(raise_exception=True):
         post_serializer.save()
-        
-    tags_data_list = edit_data['tags'].replace(',' , '').split('#')
+
+    tags_data_list = edit_data['tags'].replace(',', '').split('#')
     del tags_data_list[0]
     for tag in tags_data_list:
         TagName.objects.get_or_create(name=tag)
         post_serializer.instance.tags.add(TagName.objects.get(name=tag))
-    
+
+
 def soft_delete_post(user: User, post_id: int) -> None:
     """
     Args:
@@ -133,7 +141,8 @@ def soft_delete_post(user: User, post_id: int) -> None:
     post = Post.objects.get(id=post_id, writer_id=user)
     post.is_active = False
     post.save()
-    
+
+
 def recover_post(user: User, post_id: int) -> None:
     """
     Args:
@@ -147,7 +156,8 @@ def recover_post(user: User, post_id: int) -> None:
     if post.is_active == False:
         post.is_active = True
         post.save()
-        
+
+
 def hard_delete_post(user: User, post_id: int) -> None:
     """
     Args:
@@ -159,7 +169,8 @@ def hard_delete_post(user: User, post_id: int) -> None:
     """
     post = Post.objects.get(id=post_id, writer_id=user)
     post.delete()
-    
+
+
 def read_detail_post(post_id: int) -> PostDetailSerializer:
     """
     Args:
@@ -173,6 +184,7 @@ def read_detail_post(post_id: int) -> PostDetailSerializer:
     post_serializer = PostDetailSerializer(post).data
     return post_serializer
 
+
 def like_post(user: User, post_id: int) -> bool:
     """
     Args:
@@ -184,7 +196,8 @@ def like_post(user: User, post_id: int) -> bool:
         False : "좋아요취소" 
     """
     post = Post.objects.get(id=post_id)
-    getted_like_obj, created_like_obj = Like.objects.get_or_create(user=user, post=post)
+    getted_like_obj, created_like_obj = Like.objects.get_or_create(
+        user=user, post=post)
     if created_like_obj:
         return True
     getted_like_obj.delete()

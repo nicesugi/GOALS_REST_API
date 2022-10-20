@@ -55,12 +55,12 @@ class TestAPI(APITestCase):
         user = User.objects.get(username='test_user')
         client.force_authenticate(user=user)
         create_data = {
-            'title': 'test_title',
-            'content': 'test_content',
-            'tags': '#sns',
-            'is_active': True,
-            'views': 60,
-            'created_date': '2022-10-16 08:00:00.000000'
+            'title':'test_title',
+            'content':'test_content',
+            'tags':'#sns',
+            'is_active':True,
+            'views':60,
+            'created_date':'2022-10-16 08:00:00.000000'
         }
 
         url = '/posts/'
@@ -80,12 +80,12 @@ class TestAPI(APITestCase):
         client.force_authenticate(user=user)
         post = Post.objects.get(title='test_title', content='test_content')
         edit_data = {
-            'title': 'test_edit_title',
-            'content': 'test_edit_content',
-            'tags': '#sns,#apple',
-            'is_active': True,
-            'views': 60,
-            'created_date': '2022-10-16 08:00:00.000000'
+            'title':'test_edit_title',
+            'content':'test_edit_content',
+            'tags':'#sns,#apple',
+            'is_active':True,
+            'views':60,
+            'created_date':'2022-10-16 08:00:00.000000'
         }
 
         url = '/posts/' + str(post.id)

@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-  
+
     'corsheaders',
 
     'users',
@@ -100,7 +100,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
     "access-control-allow-origin"
 ]
-       
+
 ROOT_URLCONF = 'SNS.urls'
 
 TEMPLATES = [
@@ -137,10 +137,10 @@ DATABASES = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 
@@ -159,7 +159,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
-STATIC_ROOT = BASE_DIR/ 'static'
+STATIC_ROOT = BASE_DIR / 'static'
 STATIC_URL = '/static/'
 
 # Default primary key field type
@@ -192,7 +192,7 @@ SIMPLE_JWT = {
 
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'TOKEN_TYPE_CLAIM': 'token_type',
-    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser', 
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
 
     'JTI_CLAIM': 'jti',
 

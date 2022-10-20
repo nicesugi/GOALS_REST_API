@@ -1,6 +1,7 @@
 from typing import Dict
 from users.serializers import UserSignupSerializer
 
+
 def create_user(create_data: (Dict[str, str])) -> None:
     """
     Args:

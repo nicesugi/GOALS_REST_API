@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import User
+from users.models import User
+
 
 class UserSignupSerializer(serializers.ModelSerializer):
     def create(self, *args, **kwargs):
@@ -8,7 +9,7 @@ class UserSignupSerializer(serializers.ModelSerializer):
         user.set_password(pw)
         user.save()
         return user
-    
+
     class Meta:
         model = User
         fields = '__all__'
