@@ -15,6 +15,16 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 
 <details open>
 <summary>
+기능구현
+</summary>
+<pre>
+    - RESTful API 작성을 위한 Service / View Layer 구분
+    - 에러 핸들링 통일성 유지
+    - 테스트 코드 작성
+</pre></details>
+
+<details>
+<summary>
 사용자
 </summary>
 <pre>
@@ -22,7 +32,7 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
     - simple JWT로 로그인 기능 구현
 </pre></details>
 
-<details open>
+<details>
 <summary>게시글</summary>
 <pre>
 
@@ -54,13 +64,15 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 <details><summary> 작성</summary>
     - 권한 : 로그인이 된 작성자
     - 입력값 : 제목, 내용, 해시태그
-    - 사용자는 JWT 토큰의 request.user를 통해서 가져옴
     - 해시태그는 '#'로 시작되고 ','로 구분되는 텍스트가 입력됨
         - 예시 { “tags”: “#맛집,#서울,#브런치 카페,#주말” }
 </details>
 
 <details><summary> 수정</summary>
     - 권한 : 로그인이 된 작성자
+    - 수정값 : 제목, 내용, 해시태그
+    - 해시태그는 '#'로 시작되고 ','로 구분되는 텍스트가 입력됨
+        - 예시 { “tags”: “#맛집,#서울,#브런치 카페,#주말” }
 </details>
 
 <details><summary> 삭제 </summary>
@@ -71,13 +83,14 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 
 <details><summary> 복구</summary>
     - 권한 : 로그인이 된 작성자
+    - soft delete가 되어있는 게시글만 복구가 가능
 </details>
 
 <details><summary> 좋아요</summary>
     - 권한 : 로그인이 된 사용자
-    - get_or_create()
-    - create가 되면은 return 생성
-    - get이 되면 삭제
+    - get_or_create() 사용하여 
+    - create -> True -> 좋아요 등록 후 좋아요 수 +1
+    - get -> False -> 좋아요 취소 후 좋아요 수 -1
 </details>
 </pre>
 </details>
