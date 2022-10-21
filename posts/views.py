@@ -42,9 +42,6 @@ class PostView(APIView):
         except TypeError:
             return Response({'detail':'로그인상태나 작성내용을 확인해주세요'},
                             status=status.HTTP_400_BAD_REQUEST)
-        except Post.DoesNotExist:
-            return Response({'detail':'존재하지 않는 게시글입니다'},
-                            status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         if request.user.is_anonymous:

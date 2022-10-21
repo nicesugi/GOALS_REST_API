@@ -55,12 +55,12 @@ class TestAPI(APITestCase):
         user = User.objects.get(username='test_user')
         client.force_authenticate(user=user)
         create_data = {
-            'title':'test_title',
-            'content':'test_content',
-            'tags':'#sns',
-            'is_active':True,
-            'views':60,
-            'created_date':'2022-10-16 08:00:00.000000'
+            'title': 'test_title',
+            'content': 'test_content',
+            'tags': '#sns',
+            'is_active': True,
+            'views': 60,
+            'created_date': '2022-10-16 08:00:00.000000'
         }
 
         url = '/posts/'
@@ -80,12 +80,12 @@ class TestAPI(APITestCase):
         client.force_authenticate(user=user)
         post = Post.objects.get(title='test_title', content='test_content')
         edit_data = {
-            'title':'test_edit_title',
-            'content':'test_edit_content',
-            'tags':'#sns,#apple',
-            'is_active':True,
-            'views':60,
-            'created_date':'2022-10-16 08:00:00.000000'
+            'title': 'test_edit_title',
+            'content': 'test_edit_content',
+            'tags': '#sns,#apple',
+            'is_active': True,
+            'views': 60,
+            'created_date': '2022-10-16 08:00:00.000000'
         }
 
         url = '/posts/' + str(post.id)
@@ -97,6 +97,30 @@ class TestAPI(APITestCase):
         result = response.json()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(result['detail'], '게시글이 수정되었습니다')
+
+    def test_post_view_def_put_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+        edit_data = {
+            'title': 'test_edit_title',
+            'content': 'test_edit_content',
+            'tags': '#sns,#apple',
+            'is_active': True,
+            'views': 60,
+            'created_date': '2022-10-16 08:00:00.000000'
+        }
+
+        url = '/posts/' + str(404)
+        response = client.put(
+            url,
+            json.dumps(edit_data),
+            content_type="application/json"
+        )
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
 
     def test_post_view_def_delete_ok(self):
         client = APIClient()
@@ -111,6 +135,18 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['detail'], '게시글이 비활성화가 되었습니다')
 
+    def test_post_view_def_delete_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+
+        url = '/posts/' + str(404)
+        response = client.delete(url)
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
+
     def test_existence_post_view_def_post_ok(self):
         client = APIClient()
 
@@ -123,6 +159,18 @@ class TestAPI(APITestCase):
         result = response.json()
         self.assertEqual(response.status_code, 201)
         self.assertEqual(result['detail'], '게시글이 복구되었습니다')
+
+    def test_existence_post_view_def_post_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+
+        url = '/posts/' + str(404) + '/existence'
+        response = client.post(url)
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
 
     def test_existence_post_view_def_delete_ok(self):
         client = APIClient()
@@ -137,6 +185,18 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['detail'], '게시글이 삭제되었습니다')
 
+    def test_existence_post_view_def_delete_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+
+        url = '/posts/' + str(404) + '/existence'
+        response = client.delete(url)
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
+
     def test_post_detail_view_def_get_ok(self):
         client = APIClient()
 
@@ -150,6 +210,18 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['id'], 1)
         self.assertEqual(result['title'], 'test_title')
+
+    def test_post_detail_view_def_get_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+
+        url = '/posts/detail/' + str(404)
+        response = client.get(url)
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
 
     def test_like_view_def_post_ok_case_true(self):
         client = APIClient()
@@ -178,3 +250,15 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(result['detail'], '좋아요를 취소했습니다')
         self.assertEqual(result['like_count'], 0)
+
+    def test_like_view_def_post_not_found(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+
+        url = '/posts/' + str(404) + '/like'
+        response = client.post(url)
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result['detail'], '존재하지 않는 게시글입니다')
