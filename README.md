@@ -1,4 +1,5 @@
-# Social_Networking_Service
+# GOALS_REST_API
+
 RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코드, 컨벤션에 맞는 클린코드를 작성하기 위한 개인 프로젝트
 
 <img src="https://img.shields.io/badge/Python-3.9.10-3776AB?style=flat-square&logo=Python&logoColor=white"/> <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=Django&logoColor=white"/> <img src="https://img.shields.io/badge/Django REST framework-092E20?style=flat-square&logo=Django REST framework&logoColor=white"/> 
@@ -20,7 +21,7 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 <pre>
     - RESTful API 작성을 위한 Service / View Layer 구분
     - 에러 핸들링 통일성 유지
-    - 테스트 코드 작성
+    - 테스트 코드 작성 ; Service & API 
 </pre></details>
 
 <details>

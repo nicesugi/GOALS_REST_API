@@ -17,7 +17,7 @@ services:
     container_name: django_container
     env_file:
       - ./.env
-    command: gunicorn SNS.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn GOALS.wsgi:application --bind 0.0.0.0:8000
 
 volumes:
   static_volume:
