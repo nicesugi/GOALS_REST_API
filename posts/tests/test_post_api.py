@@ -73,6 +73,30 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(result['detail'], '게시글이 작성되었습니다')
 
+    def test_post_view_def_post_validation_error(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+        create_data = {
+            'title': '',
+            'content': '',
+            'tags': '#sns',
+            'is_active': True,
+            'views': 60,
+            'created_date': '2022-10-16 08:00:00.000000'
+        }
+
+        url = '/posts/'
+        response = client.post(
+            url,
+            json.dumps(create_data),
+            content_type="application/json"
+        )
+        result = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(result['detail'], '제목이나 내용을 확인해주세요')
+        
     def test_post_view_def_post_unauthorized(self):
         client = APIClient()
 
@@ -120,6 +144,31 @@ class TestAPI(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(result['detail'], '게시글이 수정되었습니다')
 
+    def test_post_view_def_put_validation_error(self):
+        client = APIClient()
+
+        user = User.objects.get(username='test_user')
+        client.force_authenticate(user=user)
+        post = Post.objects.get(title='test_title', content='test_content')
+        edit_data = {
+            'title': '',
+            'content': '',
+            'tags': '',
+            'is_active': True,
+            'views': 60,
+            'created_date': '2022-10-16 08:00:00.000000'
+        }
+
+        url = '/posts/' + str(post.id)
+        response = client.put(
+            url,
+            json.dumps(edit_data),
+            content_type="application/json"
+        )
+        result = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(result['detail'], '제목이나 내용을 확인해주세요')
+        
     def test_post_view_def_put_unauthorized(self):
         client = APIClient()
 
@@ -226,7 +275,7 @@ class TestAPI(APITestCase):
         result = response.json()
         self.assertEqual(response.status_code, 401)
         self.assertEqual(result['detail'], '로그인을 해주세요')
-        
+    
     def test_existence_post_view_def_post_not_found(self):
         client = APIClient()
 
@@ -262,14 +311,15 @@ class TestAPI(APITestCase):
         result = response.json()
         self.assertEqual(response.status_code, 401)
         self.assertEqual(result['detail'], '로그인을 해주세요')
-        
+
     def test_existence_post_view_def_delete_not_found(self):
         client = APIClient()
 
-        user = User.objects.get(username='test_user')
+        post = Post.objects.get(title='test_title', content='test_content')
+        user = User.objects.create(username='not_writer')
         client.force_authenticate(user=user)
 
-        url = '/posts/' + str(404) + '/existence'
+        url = '/posts/' + str(post.id) + '/existence'
         response = client.delete(url)
         result = response.json()
         self.assertEqual(response.status_code, 404)
