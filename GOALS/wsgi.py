@@ -1,5 +1,5 @@
 """
-WSGI config for SNS project.
+WSGI config for GOALS project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SNS.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'GOALS.settings')
 
 application = get_wsgi_application()
