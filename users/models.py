@@ -5,7 +5,7 @@ from django.db import models
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None):
         if not email:
-            raise ValueError('Users must have an email')
+            raise ValueError("Users must have an email")
         user = self.model(
             email=email,
         )
@@ -21,14 +21,14 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser):
-    username = models.CharField('사용자 계정', max_length=12, unique=True)
-    email = models.EmailField('이메일', max_length=50, unique=True)
-    password = models.CharField('비밀번호', max_length=128)
+    username = models.CharField("사용자 계정", max_length=12, unique=True)
+    email = models.EmailField("이메일", max_length=50, unique=True)
+    password = models.CharField("비밀번호", max_length=128)
 
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
 
     REQUIRED_FIELDS = []
 

@@ -1,6 +1,6 @@
 from django.db.models import Count, Q
 from typing import Dict
-from posts.models import (Like, Post, TagName)
+from posts.models import Like, Post, TagName
 from posts.serializers import PostSerializer, PostDetailSerializer
 from users.models import User
 
@@ -10,19 +10,22 @@ def read_posts(order_by: str, reverse: int) -> Post:
     Args:
         order_by (str) : 정렬 기준 (작성일, 조회수, 좋아요수 중 1개)
         reverse (int) : 정렬 기준(1-내림차순 / 0-오름차순)
-        
+
     Returns:
         Post : 정렬(작성일/조회수/좋아요수/내림차순/오름차순)이 된 게시글의 QuerySet
     """
     if reverse == 1:
-        reverse = '-'
+        reverse = "-"
     elif reverse == 0:
-        reverse = ''
-    if order_by == 'created_date' or order_by == 'views':
+        reverse = ""
+    if order_by == "created_date" or order_by == "views":
         posts = Post.objects.all().order_by(reverse + order_by)
-    elif order_by == 'likes':
-        posts = Post.objects.all().annotate(like_count=Count('like')
-                                            ).order_by(reverse + 'like_count')
+    elif order_by == "likes":
+        posts = (
+            Post.objects.all()
+            .annotate(like_count=Count("like"))
+            .order_by(reverse + "like_count")
+        )
     return posts
 
 
@@ -35,9 +38,7 @@ def search_posts(posts: Post, search: str) -> Post:
     Returns:
         Post : 정렬,검색이 된 게시글의 QuerySet
     """
-    posts = posts.filter(
-        Q(title__icontains=search) | Q(content__icontains=search)
-    )
+    posts = posts.filter(Q(title__icontains=search) | Q(content__icontains=search))
     return posts
 
 
@@ -50,14 +51,15 @@ def filtering_posts(posts: Post, tags: str) -> Post:
     Returns:
         Post : 정렬,검색,태그필터링이 된 게시글의 QuerySet
     """
-    if tags == '':
+    if tags == "":
         query_set = posts.all()
     else:
-        tags = tags.split(',')
+        tags = tags.split(",")
         query_set = posts.none()
         for tag in tags:
-            query_set = query_set | posts.filter(
-                posttag__tags__name__icontains=tag).distinct()
+            query_set = (
+                query_set | posts.filter(posttag__tags__name__icontains=tag).distinct()
+            )
     return query_set
 
 
@@ -71,10 +73,9 @@ def pagination_posts(posts: Post, page_size: int, page: int) -> PostSerializer:
     Returns:
         PostSerializer : 정렬,검색,태그필터링,페이징이 된 게시글들
     """
-    start_post = page_size * (page-1)
+    start_post = page_size * (page - 1)
     end_post = page * page_size
-    posts_serializer = PostSerializer(
-        posts[start_post:end_post], many=True).data
+    posts_serializer = PostSerializer(posts[start_post:end_post], many=True).data
     return posts_serializer
 
 
@@ -87,16 +88,16 @@ def create_post(create_data: Dict[str, str], user: User) -> None:
             "tags" : post의 hashtags /예시)"#제목,#내용,#태그"
             }
         user (int) : 로그인이 되어있는 작성자의 FK
-        
+
     Returns:
         None
     """
-    create_data['writer'] = user.id
+    create_data["writer"] = user.id
     post_data_serializer = PostSerializer(data=create_data)
     post_data_serializer.is_valid(raise_exception=True)
     post_data_serializer.save()
 
-    tags_data_list = create_data['tags'].replace(',', '').split('#')
+    tags_data_list = create_data["tags"].replace(",", "").split("#")
     del tags_data_list[0]
     for tag in tags_data_list:
         TagName.objects.get_or_create(name=tag)
@@ -122,7 +123,7 @@ def edit_post(edit_data: Dict[str, str], user: User, post_id: int) -> None:
     if post_serializer.is_valid(raise_exception=True):
         post_serializer.save()
 
-    tags_data_list = edit_data['tags'].replace(',', '').split('#')
+    tags_data_list = edit_data["tags"].replace(",", "").split("#")
     del tags_data_list[0]
     for tag in tags_data_list:
         TagName.objects.get_or_create(name=tag)
@@ -134,7 +135,7 @@ def soft_delete_post(user: User, post_id: int) -> None:
     Args:
         user (int) : 로그인이 되어있는 작성자의 FK
         post_id (int) : 비활성화하고자 하는 게시글의 PK
-        
+
     Returns:
         None
     """
@@ -148,7 +149,7 @@ def recover_post(user: User, post_id: int) -> None:
     Args:
         user (int) : 로그인이 되어있는 작성자의 FK
         post_id (int) : 복구하고자 하는 게시글의 PK
-        
+
     Returns:
         None
     """
@@ -163,7 +164,7 @@ def hard_delete_post(user: User, post_id: int) -> None:
     Args:
         user (int) : 로그인이 되어있는 작성자의 FK
         post_id (int) : 완전 삭제하고자 하는 게시글의 PK
-        
+
     Returns:
         None
     """
@@ -193,11 +194,10 @@ def like_post(user: User, post_id: int) -> bool:
 
     Returns:
         True : "좋아요"
-        False : "좋아요취소" 
+        False : "좋아요취소"
     """
     post = Post.objects.get(id=post_id)
-    getted_like_obj, created_like_obj = Like.objects.get_or_create(
-        user=user, post=post)
+    getted_like_obj, created_like_obj = Like.objects.get_or_create(user=user, post=post)
     if created_like_obj:
         return True
     getted_like_obj.delete()

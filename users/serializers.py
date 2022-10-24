@@ -2,7 +2,7 @@ from rest_framework import serializers
 from users.models import User
 
 
-class UserSignupSerializer(serializers.ModelSerializer):
+class UserSignUpSerializer(serializers.ModelSerializer):
     def create(self, *args, **kwargs):
         user = super().create(*args, **kwargs)
         pw = user.password
@@ -12,4 +12,4 @@ class UserSignupSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"

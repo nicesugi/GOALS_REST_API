@@ -1,8 +1,8 @@
 from typing import Dict
-from users.serializers import UserSignupSerializer
+from users.serializers import UserSignUpSerializer
 
 
-def create_user(create_data: (Dict[str, str])) -> None:
+def sign_up(create_data: (Dict[str, str])) -> None:
     """
     Args:
         create_data (Dict[str, str]) : {
@@ -10,11 +10,11 @@ def create_user(create_data: (Dict[str, str])) -> None:
             "email" : user의 email,
             "password" : user의 password
         }
-    
+
     Returns:
         None
 
     """
-    user_data_serializer = UserSignupSerializer(data=create_data)
-    user_data_serializer.is_valid(raise_exception=True)
-    user_data_serializer.save()
+    serializer = UserSignUpSerializer(data=create_data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
