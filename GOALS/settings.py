@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "posts",
 ]
 
+APPEND_SLASH = False
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
