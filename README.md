@@ -20,7 +20,8 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 
 - RESTful API 작성을 위한 Service / View Layer 구분
 - 에러 핸들링 통일성 유지
-- 테스트 코드 작성 ; Service & API 
+- 테스트 코드 작성
+    - unittest(게시글 Service & API)
 
 
 <details open>
