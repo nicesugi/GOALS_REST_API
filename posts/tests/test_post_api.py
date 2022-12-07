@@ -1,7 +1,9 @@
+import json
+
 from rest_framework.test import APIClient, APITestCase
+
 from posts.models import Like, Post, PostTag, TagName
 from users.models import User
-import json
 
 
 class TestAPI(APITestCase):

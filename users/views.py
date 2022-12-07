@@ -2,9 +2,8 @@ from rest_framework import status
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from users.service.user_services import (
-    sign_up,
-)
+
+from users.services.user_services import sign_up
 
 
 class UserView(APIView):
