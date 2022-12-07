@@ -1,7 +1,9 @@
-from django.db.models import Count, Q
 from typing import Dict
+
+from django.db.models import Count, Q
+
 from posts.models import Like, Post, TagName
-from posts.serializers import PostSerializer, PostDetailSerializer
+from posts.serializers import PostDetailSerializer, PostSerializer
 from users.models import User
 
 

@@ -3,20 +3,14 @@ from django.db.models import Count
 from django.test import TestCase
 from django.test.utils import CaptureQueriesContext
 from rest_framework import exceptions
+
 from posts.models import Like, Post, PostTag, TagName
-from posts.services.post_services import (
-    read_posts,
-    search_posts,
-    filtering_posts,
-    pagination_posts,
-    create_post,
-    edit_post,
-    soft_delete_post,
-    recover_post,
-    hard_delete_post,
-    read_detail_post,
-    like_post,
-)
+from posts.services.post_services import (create_post, edit_post,
+                                          filtering_posts, hard_delete_post,
+                                          like_post, pagination_posts,
+                                          read_detail_post, read_posts,
+                                          recover_post, search_posts,
+                                          soft_delete_post)
 from users.models import User
 
 
