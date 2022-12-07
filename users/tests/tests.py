@@ -2,4 +2,5 @@ import pytest
 
 
 def test_true():
-    assert True
+    a = 1
+    assert a == 1
