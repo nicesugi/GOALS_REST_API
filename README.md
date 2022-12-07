@@ -3,6 +3,9 @@
 RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코드, 컨벤션에 맞는 클린코드를 작성하기 위한 개인 프로젝트
 
 <img src="https://img.shields.io/badge/Python-3.9.10-3776AB?style=flat-square&logo=Python&logoColor=white"/> <img src="https://img.shields.io/badge/Django-092E20?style=flat-square&logo=Django&logoColor=white"/> <img src="https://img.shields.io/badge/Django REST framework-092E20?style=flat-square&logo=Django REST framework&logoColor=white"/> 
+<a href="https://pycqa.github.io/isort/" rel="nofollow">
+    <img src="https://camo.githubusercontent.com/fe4a658dd745f746410f961ae45d44355db1cc0e4c09c7877d265c1380248943/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f253230696d706f7274732d69736f72742d2532333136373462313f7374796c653d666c6174266c6162656c436f6c6f723d656638333336" alt="Imports: isort" style="max-width: 100%;">
+  </a>
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ### 목차
@@ -15,30 +18,15 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
 
 ## 기능구현
 
+- RESTful API 작성을 위한 Service / View Layer 구분
+- 에러 핸들링 통일성 유지
+- 테스트 코드 작성 ; Service & API 
+
+
 <details open>
-<summary>
-기능구현
-</summary>
-<pre>
-    - RESTful API 작성을 위한 Service / View Layer 구분
-    - 에러 핸들링 통일성 유지
-    - 테스트 코드 작성 ; Service & API 
-</pre></details>
-
-<details>
-<summary>
-사용자
-</summary>
-<pre>
-    - 회원가입, 로그인 시 사용 = Email
-    - simple JWT로 로그인 기능 구현
-</pre></details>
-
-<details>
 <summary>게시글</summary>
 <pre>
-
-<details><summary> 목록 조회</summary>
+- 목록 조회
     - 권한 : 모든 사용자
     - params를 통한 매개변수를 받아와서 기능 구현
     - 정렬
@@ -56,46 +44,44 @@ RESTful API를 작성하는 것과 테스트코드를 작성해 빈틈없는 코
     - 페이징
         - default : 1 페이지 당 10개의 게시글 수
         - params에 원하는 게시글 사이즈를 입력하여 사이즈 조정이 가능
-</details>
-
-<details><summary> 게시글 상세 조회</summary>
+- 게시글 상세 조회
     - 권한 : 로그인이 된 사용자
     - 상세보기를 할 때마다 조회수 + 1
-</details>
-
-<details><summary> 작성</summary>
+- 작성
     - 권한 : 로그인이 된 작성자
     - 입력값 : 제목, 내용, 해시태그
     - 해시태그는 '#'로 시작되고 ','로 구분되는 텍스트가 입력됨
         - 예시 { “tags”: “#맛집,#서울,#브런치 카페,#주말” }
-</details>
-
-<details><summary> 수정</summary>
+- 수정
     - 권한 : 로그인이 된 작성자
     - 수정값 : 제목, 내용, 해시태그
     - 해시태그는 '#'로 시작되고 ','로 구분되는 텍스트가 입력됨
         - 예시 { “tags”: “#맛집,#서울,#브런치 카페,#주말” }
-</details>
-
-<details><summary> 삭제 </summary>
+- 삭제 
     - 권한 : 로그인이 된 작성자
     - soft delete 삭제시 비활성화
-    - hard delete 삭제시 영구삭제
-</details>
-
-<details><summary> 복구</summary>
+    - hard delete 삭제시 영구삭제=
+- 복구
     - 권한 : 로그인이 된 작성자
     - soft delete가 되어있는 게시글만 복구가 가능
-</details>
-
-<details><summary> 좋아요</summary>
+- 좋아요
     - 권한 : 로그인이 된 사용자
     - get_or_create() 사용하여 
     - create -> True -> 좋아요 등록 후 좋아요 수 +1
     - get -> False -> 좋아요 취소 후 좋아요 수 -1
-</details>
+
 </pre>
 </details>
+
+
+<details open>
+<summary>
+사용자
+</summary>
+<pre>
+    - 회원가입, 로그인 시 사용 = Email
+    - simple JWT로 로그인 기능 구현
+</pre></details>
 
 ---
 
