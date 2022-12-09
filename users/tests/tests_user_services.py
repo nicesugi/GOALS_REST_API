@@ -8,7 +8,7 @@ from users.services.user_services import sign_up
 class TestUserServices(TestCase):
     @classmethod
     def setUpTestData(cls):
-        user = User.objects.create(
+        cls.existed_user_data = User.objects.create(
             username="test_user", email="test_email@example.com", password="test_pw"
         )
 
@@ -34,15 +34,13 @@ class TestUserServices(TestCase):
         case : 중복되는 username을 입력했을 경우
         result : 실패/ ValidationError 발생
         """
-        existed_user = User.objects.get(username="test_user")
         create_data = {
             "username": "test_user",
             "email": "user1@example.com",
             "password": "user1password",
         }
-        if create_data["username"] == existed_user.username:
-            with self.assertRaises(exceptions.ValidationError):
-                sign_up(create_data)
+        with self.assertRaises(exceptions.ValidationError):
+            sign_up(create_data)
 
     def test_fail_sign_up_same_email(self):
         """
@@ -50,15 +48,13 @@ class TestUserServices(TestCase):
         case : 중복되는 email을 입력했을 경우
         result : 실패/ ValidationError 발생
         """
-        existed_user = User.objects.get(email="test_email@example.com")
         create_data = {
             "username": "user1",
             "email": "test_email@example.com",
             "password": "user1password",
         }
-        if create_data["email"] == existed_user.email:
-            with self.assertRaises(exceptions.ValidationError):
-                sign_up(create_data)
+        with self.assertRaises(exceptions.ValidationError):
+            sign_up(create_data)
 
     def test_fail_sign_up_without_arg_create_data(self):
         """

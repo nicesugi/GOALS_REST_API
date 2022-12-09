@@ -8,7 +8,7 @@ from users.models import User
 class TestUserViewAPI(APITestCase):
     @classmethod
     def setUpTestData(cls):
-        existed_user_data1 = User.objects.create(
+        cls.existed_user_data = User.objects.create(
             username="test_user",
             email="test_user@example.com",
             password="test_user_password",
@@ -33,7 +33,6 @@ class TestUserViewAPI(APITestCase):
 
     def test_user_view_def_post_400_same_email(self):
         client = APIClient()
-        existed_user_data = User.objects.get(username="test_user")
         create_data = {
             "username": "test_user",
             "email": "user1@example.com",
@@ -62,8 +61,9 @@ class TestUserViewAPI(APITestCase):
             url, json.dumps(create_data), content_type="application/json"
         )
         result = response.json()
+        field = result["detail"].split("는")[0]
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(result["detail"], "이 필드는 blank일 수 없습니다.")
+        self.assertEqual(result["detail"], field + "는 blank일 수 없습니다.")
 
     def test_user_view_def_post_400_over_max_length_of_username(self):
         client = APIClient()

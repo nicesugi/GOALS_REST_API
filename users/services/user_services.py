@@ -14,7 +14,6 @@ def sign_up(create_data: (Dict[str, str])) -> None:
 
     Returns:
         None
-
     """
     serializer = UserSignUpSerializer(data=create_data)
     serializer.is_valid(raise_exception=True)
