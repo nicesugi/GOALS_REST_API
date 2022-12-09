@@ -81,3 +81,12 @@ class TestUserViewAPI(APITestCase):
         result = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertEqual(result["detail"], "이 필드의 글자 수가 12 이하인지 확인하십시오.")
+
+    def test_user_view_def_post_without_body(self):
+        client = APIClient()
+        url = "/users"
+
+        response = client.post(url, content_type="application/json")
+        result = response.json()
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(result["detail"], "입력받은 값이 없습니다. 다시 확인해주세요")
